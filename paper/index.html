@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A public-safe study of search-performance and content signals for content-decline review prioritization across 30,000 pages.">
+  <title>Search Performance Signals for Content-Decline Review Prioritization</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="hero" id="top">
+    <div class="shell">
+      <nav class="nav">
+        <a class="brand" href="#top">FlyRank · Research</a>
+        <div class="navlinks">
+          <a href="#question">Question</a>
+          <a href="#method">Method</a>
+          <a href="#results">Results</a>
+          <a href="#limitations">Limitations</a>
+          <a href="#playbook">Playbook</a>
+        </div>
+      </nav>
+
+      <div class="eyebrow">RESEARCH PAPER · ML INTERNSHIP</div>
+      <h1>Search Performance Signals for <span>Content-Decline Review Prioritization</span></h1>
+      <p class="dek">Can observable search-performance and content signals help teams decide which pages deserve investigation first?</p>
+
+      <div class="meta-row">
+        <span>30,000 pages</span>
+        <span>Trailing 90-day window</span>
+        <span>7 unseen clients</span>
+        <span>Public-safe · pseudonymized</span>
+      </div>
+
+      <div class="hero-note">
+        <strong>Decision supported</strong>
+        <p>Prioritize pages for human investigation when review capacity is limited — without automatically deciding which pages should be changed.</p>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="section abstract">
+      <div class="shell narrow">
+        <div class="section-kicker">ABSTRACT</div>
+        <h2>From observed signals to a review workflow.</h2>
+        <p>This study asks whether search-performance and content signals can identify pages showing signs of decline and support prioritization for human review. Using 30,000 pseudonymized content-page records measured over a trailing 90-day window, the analysis defines decline as <code>trend_direction = "down"</code>, audits observable signals, trains a Decision Tree classifier, and compares it with a majority-class baseline. On the held-out validation split, the Decision Tree achieved an F1 score of <strong>0.7790</strong>, compared with <strong>0.7030</strong> for the majority-class baseline. When evaluated on 7 unseen clients, the Decision Tree achieved an F1 score of <strong>0.6788</strong>, compared with 0.7790 on the conventional held-out split. The final workflow produces a transparent ranked review queue using observed engagement, visibility, and freshness signals, but it does not make causal claims or automatically change content.</p>
+      </div>
+    </section>
+
+    <section class="section" id="question">
+      <div class="shell">
+        <div class="section-kicker">01 · THE QUESTION</div>
+        <div class="two-col">
+          <div>
+            <h2>When review capacity is limited, which pages deserve attention first?</h2>
+          </div>
+          <div>
+            <p>Search-driven content teams may have many pages that could warrant investigation, while review and refresh capacity is limited. The practical problem is therefore not simply detecting a decline signal; it is turning available evidence into a review queue that a human can inspect.</p>
+            <p>This study asks whether observable search-performance and content attributes contain useful signal for identifying pages classified as declining, and whether that signal remains useful when the model is evaluated on clients it did not see during development.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section tinted">
+      <div class="shell">
+        <div class="stat-grid">
+          <article class="stat"><div class="stat-value">0.7790</div><div class="stat-label">Held-out F1 · Decision Tree</div></article>
+          <article class="stat"><div class="stat-value">0.6788</div><div class="stat-label">Unseen-client F1 · Decision Tree</div></article>
+          <article class="stat"><div class="stat-value">30,000</div><div class="stat-label">Content-page records</div></article>
+          <article class="stat"><div class="stat-value">54.2%</div><div class="stat-label">Pages classified as declining</div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="data">
+      <div class="shell">
+        <div class="section-kicker">02 · DATA</div>
+        <div class="two-col">
+          <div>
+            <h2>A public-safe, pseudonymized release.</h2>
+            <p class="lead">The working release contains 30,000 content-page records and 44 original columns.</p>
+          </div>
+          <div class="card-stack">
+            <div class="info-card"><strong>Measurement</strong><p>Search-performance measures are aggregated over a trailing 90-day window. Content age and freshness signals include <code>content_age_days</code> and <code>days_since_last_update</code>.</p></div>
+            <div class="info-card"><strong>Target</strong><p><code>trend_direction = "down"</code> defines the decline class. 16,262 of 30,000 pages (54.2%) are in that class.</p></div>
+            <div class="info-card"><strong>Leakage control</strong><p><code>trend_direction</code> and <code>trend_pct</code> are excluded from predictive features because they define or directly reveal the outcome.</p></div>
+            <div class="info-card"><strong>Metric handling</strong><p>Rate fields are stored as percentage-point values. For example, <code>ctr = 0.76</code> means 0.76%, not 76%.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section tinted" id="method">
+      <div class="shell">
+        <div class="section-kicker">03 · METHODOLOGY</div>
+        <h2>Four stages, from signal audit to action.</h2>
+        <div class="method-grid">
+          <article><span>01</span><h3>Signal audit</h3><p>Examine observable search-performance and content attributes for useful decline-related signal.</p></article>
+          <article><span>02</span><h3>Predictive model</h3><p>Train an interpretable Decision Tree classifier and compare it with a majority-class baseline.</p></article>
+          <article><span>03</span><h3>Validation</h3><p>Measure held-out performance, then evaluate on grouped unseen clients with no client overlap between development and validation.</p></article>
+          <article><span>04</span><h3>Action prioritization</h3><p>Translate observed engagement, visibility and freshness signals into a transparent human-review queue.</p></article>
+        </div>
+
+        <div class="validation-strip">
+          <div><strong>Development validation</strong><span>Random 80/20 held-out split</span></div>
+          <div class="arrow">→</div>
+          <div><strong>Generalization validation</strong><span>23,837 train pages / 25 clients<br>6,163 test pages / 7 unseen clients</span></div>
+        </div>
+
+        <div class="note"><strong>Leakage check:</strong> a model using <code>trend_pct</code> would directly expose the target. Those fields are therefore excluded from the reported predictive results.</div>
+      </div>
+    </section>
+
+    <section class="section" id="results">
+      <div class="shell">
+        <div class="section-kicker">04 · RESULTS</div>
+        <div class="two-col result-intro">
+          <div><h2>The held-out result is stronger than the unseen-client result.</h2></div>
+          <div><p>The Decision Tree improved F1 relative to the majority-class baseline on the same held-out split. Under unseen-client grouped validation, the observed F1 decreased to 0.6788.</p></div>
+        </div>
+
+        <div class="figure-card">
+          <div class="figure-head"><div><span class="figure-no">FIGURE 01</span><h3>Decision Tree vs majority-class baseline</h3></div><span class="metric">F1</span></div>
+          <svg class="chart" viewBox="0 0 760 330" role="img" aria-label="Bar chart showing majority-class baseline F1 0.7030 and Decision Tree F1 0.7790">
+            <line x1="90" y1="270" x2="720" y2="270" class="axis"/>
+            <line x1="90" y1="70" x2="90" y2="270" class="axis"/>
+            <line x1="90" y1="170" x2="720" y2="170" class="grid"/>
+            <line x1="90" y1="70" x2="720" y2="70" class="grid"/>
+            <text x="55" y="275">0</text><text x="45" y="175">0.5</text><text x="45" y="75">1.0</text>
+            <rect x="190" y="129" width="150" height="141" rx="10" class="bar"/>
+            <rect x="480" y="114" width="150" height="156" rx="10" class="bar dark"/>
+            <text x="265" y="113" text-anchor="middle" class="value">0.703</text>
+            <text x="555" y="98" text-anchor="middle" class="value">0.779</text>
+            <text x="265" y="305" text-anchor="middle">Majority-class baseline</text>
+            <text x="555" y="305" text-anchor="middle">Decision Tree</text>
+          </svg>
+          <p class="caption">Both methods were evaluated on the same held-out split. The baseline F1 was 0.7030; the Decision Tree F1 was 0.7790.</p>
+        </div>
+
+        <div class="figure-card">
+          <div class="figure-head"><div><span class="figure-no">FIGURE 02</span><h3>Generalization under different validation designs</h3></div><span class="metric">F1</span></div>
+          <svg class="chart" viewBox="0 0 760 330" role="img" aria-label="Bar chart showing held-out validation F1 0.7790 and unseen-client validation F1 0.6788">
+            <line x1="90" y1="270" x2="720" y2="270" class="axis"/>
+            <line x1="90" y1="70" x2="90" y2="270" class="axis"/>
+            <line x1="90" y1="170" x2="720" y2="170" class="grid"/>
+            <line x1="90" y1="70" x2="720" y2="70" class="grid"/>
+            <text x="55" y="275">0</text><text x="45" y="175">0.5</text><text x="45" y="75">1.0</text>
+            <rect x="190" y="114" width="150" height="156" rx="10" class="bar dark"/>
+            <rect x="480" y="134" width="150" height="136" rx="10" class="bar"/>
+            <text x="265" y="98" text-anchor="middle" class="value">0.779</text>
+            <text x="555" y="118" text-anchor="middle" class="value">0.679</text>
+            <text x="265" y="305" text-anchor="middle">Held-out validation</text>
+            <text x="555" y="305" text-anchor="middle">Unseen-client validation</text>
+          </svg>
+          <p class="caption">The observed F1 changed from 0.7790 to 0.6788 when the model was evaluated on 7 clients excluded from development. The absolute change was -0.1002 F1.</p>
+        </div>
+
+        <div class="results-table-wrap">
+          <table>
+            <caption>Table 01 · Classification results</caption>
+            <thead><tr><th>Evaluation</th><th>Method</th><th>Accuracy</th><th>Precision</th><th>Recall</th><th>F1</th></tr></thead>
+            <tbody>
+              <tr><td>Held-out</td><td>Majority-class baseline</td><td>0.5420</td><td>0.5420</td><td>1.0000</td><td><strong>0.7030</strong></td></tr>
+              <tr><td>Held-out</td><td>Decision Tree</td><td>0.7393</td><td>0.7207</td><td>0.8475</td><td><strong>0.7790</strong></td></tr>
+              <tr><td>Unseen-client</td><td>Decision Tree</td><td>0.6565</td><td>0.6499</td><td>0.7104</td><td><strong>0.6788</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="baseline-note">
+          <strong>Baseline terminology:</strong> the classification comparison above uses the majority-class baseline. A separate W04 operational signal-audit rule — pages with at least 180 days since update and at least 500 impressions — produced P@20 = 0.900 and P@50 = 0.680 and is treated separately from the classification baseline.
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="limitations">
+      <div class="shell">
+        <div class="section-kicker">05 · LIMITATIONS</div>
+        <h2>What this study cannot claim.</h2>
+        <div class="limits-grid">
+          <article><strong>Observational</strong><p>The data show associations, not controlled evidence that a specific content intervention causes improvement.</p></article>
+          <article><strong>Target-defined</strong><p>“Decline” is the dataset's <code>trend_direction = "down"</code> class, not an independent measure of content quality.</p></article>
+          <article><strong>Client generalization</strong><p>The observed F1 changed under unseen-client validation; held-out performance is not a guarantee for new clients.</p></article>
+          <article><strong>90-day window</strong><p>Short-term changes, seasonal effects, and longer-term trends may not be fully represented.</p></article>
+          <article><strong>Structured missingness</strong><p>Some fields are systematically unavailable for particular content types, so preprocessing choices can affect signal.</p></article>
+          <article><strong>Heuristic queue</strong><p>The action-playbook weights and thresholds are transparent decision-support heuristics, not experimentally validated intervention thresholds.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section tinted" id="playbook">
+      <div class="shell">
+        <div class="section-kicker">06 · ACTION PLAYBOOK</div>
+        <div class="two-col">
+          <div>
+            <h2>Turn signals into a human-review queue.</h2>
+            <p>The final priority score combines 60% engagement signal with 40% normalized log visibility. Reason codes then point reviewers toward the signal worth investigating.</p>
+            <p class="small">The score orders investigation. It does not prove that a page needs a refresh.</p>
+          </div>
+          <div class="playbook-list">
+            <div><span>66.93%</span><strong>monitor</strong><em>20,080 pages</em></div>
+            <div><span>32.62%</span><strong>low engagement + visible</strong><em>9,787 pages</em></div>
+            <div><span>0.29%</span><strong>high engagement + low volume</strong><em>88 pages</em></div>
+            <div><span>0.08%</span><strong>stale content</strong><em>24 pages</em></div>
+            <div><span>0.07%</span><strong>high engagement + visible</strong><em>21 pages</em></div>
+          </div>
+        </div>
+
+        <div class="review-flow">
+          <div><span>01</span>Verify search intent</div><div>→</div>
+          <div><span>02</span>Check current signals</div><div>→</div>
+          <div><span>03</span>Review context & overlap</div><div>→</div>
+          <div><span>04</span>Record the human decision</div>
+        </div>
+
+        <div class="note warning"><strong>No-go automation:</strong> the workflow does not automatically rewrite, publish, delete, redirect, merge, split, or declare a content intervention successful.</div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="shell">
+        <div class="section-kicker">07 · REPRODUCIBILITY</div>
+        <div class="two-col">
+          <div><h2>Trace the paper back to the work.</h2></div>
+          <div class="links">
+            <a href="https://github.com/pr120107/flyrank-ml-internship/blob/main/work/notebooks/capstone.ipynb">Capstone notebook ↗</a>
+            <a href="https://github.com/pr120107/flyrank-ml-internship/blob/main/work/notebooks/w06_validation_audit.ipynb">Validation notebook ↗</a>
+            <a href="https://github.com/pr120107/flyrank-ml-internship">Repository ↗</a>
+            <a href="https://flyrank.ai">FlyRank ↗</a>
+          </div>
+        </div>
+        <p class="small reproducibility">The deployed paper uses the public-safe, pseudonymized internship release. Client names, private queries, and identifying information are excluded from the page.</p>
+      </div>
+    </section>
+
+    <section class="section final-credit">
+      <div class="shell narrow">
+        <div class="section-kicker">ACKNOWLEDGMENTS & DATA CREDIT</div>
+        <h2>Built on the FlyRank ML Internship dataset.</h2>
+        <p>This work was completed as part of the FlyRank ML Internship and builds on the provided public-safe, pseudonymized content-refresh dataset and research workflow.</p>
+        <a class="button" href="https://flyrank.ai">FlyRank ↗</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="shell footer-inner">
+      <span>Search Performance Signals for Content-Decline Review Prioritization</span>
+      <a href="#top">Back to top ↑</a>
+    </div>
+  </footer>
+</body>
+</html>
